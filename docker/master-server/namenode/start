@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+NAMENODE_DATA_DIR=/opt/hadoop/dfs/name
+
+mkdir -p "${NAMENODE_DATA_DIR}"
+
+# ${NAMENODE_DATA_DIR}에 파일이 있는 지 확인
+if [ -z $(ls -A "${NAMENODE_DATA_DIR}") ]; then
+  echo "Formatting namenode name directory: ${NAMENODE_DATA_DIR}"
+
+  # 네임노드 디렉터리를 포맷 (초기화)
+  hdfs namenode -format
+fi
+
+# 네임노드 start
+echo "Starting Hadoop name node..."
+hdfs --daemon start namenode
+
+
+if ! hdfs dfs -test -d /tmp
+then
+  echo "Formatting directory: /tmp"
+  hdfs dfs -mkdir -p /tmp
+fi

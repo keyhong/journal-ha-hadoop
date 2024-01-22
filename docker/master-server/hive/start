@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+NAMENODE_DATA_DIR=/opt/hadoop/dfs/name
+
+if [ ! -f "${NAMENODE_DATA_DIR}"/initialized ]; then
+  echo "Configuring Hive..."
+  hdfs dfs -mkdir -p /user/hive/warehouse
+  schematool -dbType mysql -initSchema --verbose
+  touch "${NAMENODE_DATA_DIR}"/initialized
+fi
+
+echo "Starting Hive Metastore..."
+hive --service metastore &
+
+echo "Starting Hive server2..."
+hiveserver2 &

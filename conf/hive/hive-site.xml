@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?><!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<!-- 3.X 버전 이상의 Apache Hive 메타스토어 연결에 대한 상세 document link
+https://cwiki.apache.org/confluence/display/Hive/AdminManual+Metastore+3.0+Administration
+
+** "Metastore.schema.verification" 프로퍼티는 Hive 2.X에서 3.X으로 올라오면서 파라미터명이 변경되었습니다.
+-->
+
+<!-- HDFS에 저장될 파일들에 대한 메타데이터를 저장할 메타스토어를 연결하는 conf를 설정하는 부분 -->
+<configuration>
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/user/hive/warehouse</value>
+        <description>URI of the default location for tables in the default catalog and database</description>        
+    </property>
+    <property>
+        <name>Metastore.schema.verification</name>
+        <value>false</value>
+        <description>Enforce metastore schema version consistency</description>
+    </property>
+    <property>
+    <name>hive.metastore.db.type</name>
+    <value>mysql</value>
+    </property>    
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:mysql://mysql-server:3306/metastore</value>
+        <description>Connection URL for the JDBC driver</description>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>com.mysql.cj.jdbc.Driver</value>
+        <description>JDBC driver class</description>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>keyhong</value>
+        <description>User name to connect to the RDBMS with</description>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>keyhong</value>
+        <description>Password to connect to the RDBMS with</description>        
+    </property>
+    <property>
+        <name>hive.support.concurrency</name>
+        <value>true</value>
+        <description>
+            Whether Hive supports concurrency or not. A ZooKeeper instance must be up and running for the default Hive lock manager to support read-write locks.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.support.concurrency -->
+        </description>
+    </property>
+    <property>
+        <name>hive.txn.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+        <description>
+            Set this to org.apache.hadoop.hive.ql.lockmgr.DbTxnManager as part of turning on Hive transactions.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.txn.manager -->
+        </description>
+    </property>
+    <property>
+        <name>hive.exec.dynamic.partition.mode</name>
+        <value>nonstrict</value>
+        <description>
+            the user must not specify at least one static partition, but the user accidentally may overwrites all partitions.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.exec.dynamic.partition.mode -->
+    </description>
+    </property>
+    <property>
+        <name>hive.compactor.initiator.on</name>
+        <value>true</value>
+        <description>
+            Whether to run the initiator thread on this metastore instance.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.compactor.initiator.on -->
+        </description>
+    </property>
+    <property>
+        <name>hive.compactor.cleaner.on</name>
+        <value>true</value>
+        <description>
+            Whether to run the Cleaner thread on this metastore instance.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.compactor.cleaner.on -->
+        </description>
+    </property>
+    <property>
+        <name>hive.compactor.worker.threads</name>
+        <value>2</value>
+        <description>
+            How many compactor worker threads to run on this metastore instance.
+            <!-- https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.compactor.initiator.on -->
+        </description>
+    </property>
+</configuration>

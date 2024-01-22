@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+echo "Starting Hadoop resource manager..."
+yarn --daemon start resourcemanager
+
+if ! hdfs dfs -test -d /tmp
+then
+  echo "Formatting directory: /tmp"
+  hdfs dfs -mkdir -p /tmp
+fi

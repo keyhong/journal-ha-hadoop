@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<configuration>
+   <!-- Single hostname that can be set in place of setting all
+    yarn.resourcemanager*address resources. Results in default ports
+    for ResourceManager components: scheduler - 8030, resource-tracker - 8031,
+    resourcemanager - 8032, admin - 8033, webapp - 8088. -->
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>master-server</value>
+        </description>The hostname of the RM.</description>
+    </property>
+
+    <!-- Shuffle service that needs to be set for Map Reduce applications. -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+      <name>yarn.nodemanager.local-dirs</name>
+      <value>/data/yarn/nm-local-dir</value>
+      <description>List of directories to store localized files in.</description>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.fs.state-store.uri</name>
+      <value>/data/yarn/system/rmstore</value>
+      <description>
+          URI pointing to the location of the FileSystem path where RM state will be stored.
+      </description>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.hostname</name>
+      <value>hadoop01</value>
+      </description>The hostname of the RM.</description>
+    </property>
+    <property>
+      <name>yarn.web-proxy.address</name>
+      <value>0.0.0.0:8089</value>
+    </property>
+
+
+
+
+    <!-- for Resource Manager HA configuration -->
+    <property>
+      <name>yarn.resourcemanager.ha.enabled</name>
+      <value>true</value>
+      <description>
+          Enable RM high-availability. When enabled,
+          (1) The RM starts in the Standby mode by default, and transitions to the Active mode when prompted to.
+          (2) The nodes in the RM ensemble are listed in yarn.resourcemanager.ha.rm-ids
+          (3) The id of each RM either comes from yarn.resourcemanager.ha.id if yarn.resourcemanager.ha.id is explicitly specified or can be figured out by matching yarn.resourcemanager.address.{id} with local address
+          (4) The actual physical addresses come from the configs of the pattern - {rpc-config}.{id}
+      </description>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.cluster-id</name>
+      <value>cluster-01</value>
+      <description>
+          Name of the cluster.
+          In a HA setting, this is used to ensure the RM participates in leader election for this cluster and ensures it does not affect other clusters
+      </description>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.ha.rm-ids</name>
+      <value>rm1,rm2</value>
+      <description>The list of RM nodes in the cluster when HA is enabled.</description>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.hostname.rm1</name>
+        <value>master-server</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.hostname.rm2</name>
+        <value>slave-server-1</value>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.webapp.address.rm1</name>
+      <value>master-server:8089</value>
+    </property>
+    <property>
+      <name>yarn.resourcemanager.webapp.address.rm2</name>
+		  <value>slave-server-1:8090</value>
+	  </property>
+	<property>
+		<name>hadoop.zk.address</name>
+		<value>master-server:2181,slave-server-1:2181,slave-server-2:2181</value>
+    <description>
+        Comma separated list of Host:Port pairs.
+        Each corresponds to a ZooKeeper server (e.g. “127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002”) to be used by the RM for storing RM state.
+	</property>    
+
+
+  <!-- <property>
+    <name>yarn.resourcemanager.zk-address</name>
+    <value>namenode:2181,datanode1:2181,datanode2:2181</value>
+  </property> -->
+
+</configuration>
