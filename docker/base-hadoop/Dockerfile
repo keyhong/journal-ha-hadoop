@@ -149,6 +149,7 @@ COPY "./conf/hadoop/*" "${HADOOP_CONF_DIR}"
 
 # Zookeeper Config Files to Container
 COPY "./conf/zookeeper/zoo.cfg" "${ZOOKEEPER_CONF_DIR}/zoo.cfg"
+RUN sed -i 's/\r$//g' "${ZOOKEEPER_CONF_DIR}/zoo.cfg"
 
 # Hive Config Files to Container
 COPY "./conf/hive/hive-site.xml" "${HIVE_CONF_DIR}"

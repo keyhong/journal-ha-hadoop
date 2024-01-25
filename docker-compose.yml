@@ -79,22 +79,23 @@ services:
       - x-hadoop-common
       - mysql-server
     expose:
-      - "2888" # zookeepr Quorum
-      - "3888" # zookeepr Election
-      - "8020" # dfs.namenode.rpc-address.namenode1
+      - "2888" # zookeepr quorum
+      - "3888" # zookeepr election
+      - "8020" # dfs.namenode.rpc-address.docker-cluster.nn1
       - "8033" # yarn.resourcemanager.address
       - "8042" # yarn.nodemanager.address
       - "8485" # dfs.journalnode.rpc-address
-      - "8088" # # yarn.resourcemanager.webapp.address.rm1
       - "8089" # yarn.web-proxy.address
     ports:
       # - "2181:2181"
       # - "4040:4040" # spark 
       # - "8080:8080" # airflow web
+      - "8088:8088" # yarn.resourcemanager.webapp.address.rm1
       - "9870:9870"
       - "10000:10000"
       - "18080:18080" # spark-history
       - "19888:19888" # job-history
+      - "5071:50070" # dfs.namenode.http-address.docker-cluster.nn1
     volumes:
       - namenode_data:/data
     # healthcheck: 
@@ -116,17 +117,18 @@ services:
     depends_on:
       - master-server
     expose:
-      - "2888"
-      - "3888"
-      - "8020" # dfs.namenode.rpc-address.namenode2(HA)
+      - "2888" # zookeepr quorum
+      - "3888" # zookeepr election
+      - "8020" # dfs.namenode.rpc-address.docker-cluster.nn2(HA)
       - "8033" # yarn.resourcemanager.address(HA)
       - "8042" # yarn.nodemanager.address
       - "8485" # dfs.journalnode.rpc-address(HA)
     ports:
-      - "2182:2181"
+      # - "2182:2181"
       - "8089:8088" # yarn.resourcemanager.webapp.address.rm2(HA)
       - "8081:8081"
       - "9864:9864"
+      - "5070:50070" # dfs.namenode.http-address.docker-cluster.nn2(HA)
     volumes:
       - datanode_data_1:/data/
     networks:
@@ -144,9 +146,10 @@ services:
     depends_on:
       - master-server
     expose:
-      - "2888"
-      - "3888"
+      - "2888" # zookeepr quorum
+      - "3888" # zookeepr election
       - "8042" # yarn.nodemanager.address
+      - "8485" # dfs.journalnode.rpc-address      
     ports:
       # - "2183:2181"
       - "8043:8042"

@@ -70,7 +70,7 @@
     </property>
     <property>
 		<name>yarn.resourcemanager.cluster-id</name>
-		<value>cluster-01</value>
+		<value>docker-cluster</value>
 		<description>
 			Name of the cluster.
 			In a HA setting, this is used to ensure the RM participates in leader election for this cluster and ensures it does not affect other clusters

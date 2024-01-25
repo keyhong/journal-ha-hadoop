@@ -19,7 +19,7 @@
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://master-server:8020</value>
+        <value>hdfs://docker-cluster</value>
         <description>The name of the default file system.</description>
     </property>
     <property>
@@ -29,6 +29,11 @@
             A list of ZooKeeper server addresses, separated by commas, that are to be used by the ZKFailoverController in automatic failover.
         </description>
     </property>
+
+  <!-- <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/home/hadoop/tmp</value>
+  </property> -->
 
     <!--To be able to run Hive via JDBC as root-->
     <property>

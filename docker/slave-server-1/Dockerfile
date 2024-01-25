@@ -9,27 +9,14 @@ ENV NAMENODE_DATA_DIR=/data/hadoop/dfs/name \
 
 RUN mkdir -p ${NAMENODE_DATA_DIR} ${DATANODE_DATA_DIR} ${JOURNALNODE_DATA_DIR} ${YARN_DATA_DIR}
 
-
 RUN echo "2" > "/opt/zookeeper/data/myid"
-
-# RUN "zkServer.sh start zoo.cfg"
-# TODO: Copy Process Start Files to Container
-# RUN sed -i 's/\r$//g' /start-nn
-# RUN chmod +x /start-nn
-
-# datanode
-
-# journalnode
-
-# resource-manager
-
-# node-manager
-
-# COPY run.sh /usr/local/sbin/run.sh
-# RUN sudo chmod a+x /usr/local/sbin/run.sh
 
 COPY ./docker/master-server/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
 ENTRYPOINT [ "/entrypoint" ]
+
+
+# COPY run.sh /usr/local/sbin/run.sh
+# RUN sudo chmod a+x /usr/local/sbin/run.sh
