@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -x;
+
+# nodemanager process start
+echo "Starting Hadoop nodemanager..."
+yarn --daemon start nodemanager

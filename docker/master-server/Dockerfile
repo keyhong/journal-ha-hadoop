@@ -1,36 +1,53 @@
-FROM keyhong/base-hadoop
+FROM keyhong/base-hadoop:1.0
 
-ENV DATADIR=/opt/hadoop/dfs/data
-RUN mkdir -p /opt/hadoop/dfs/data
-VOLUME /opt/hadoop/dfs/data
+ENV NAMENODE_DATA_DIR=/data/hadoop/dfs/name \
+    JOURNALNODE_DATA_DIR=/data/hadoop/dfs/journal \
+    YARN_DATA_DIR=/data/hadoop/yarn
 
-ENV SPARK_PUBLIC_DNS=localhost
-ENV SPARK_MASTER_ADDRESS=spark://master-server:7077
+RUN mkdir -p ${NAMENODE_DATA_DIR} ${JOURNALNODE_DATA_DIR} ${YARN_DATA_DIR}
+
+RUN echo "1" > "/opt/zookeeper/data/myid"
 
 # Copy Process Start Files to Container
-ARG HOST_MASTER_DIR=./docker/master
+ARG HOST_MASTER_DIR=./docker/master-server
 
-COPY "${HOST_MASTER_DIR}/hive/start-hive" /start-hive
-RUN sed -i 's/\r$//g' /start-flower
-RUN chmod +x /start-hive
+RUN echo "hi"
+# namenode
+# COPY "${HOST_MASTER_DIR}/namenode/start" /start-nn
+# RUN sed -i 's/\r$//g' /start-nn
+# RUN chmod +x /start-nn
 
-COPY "${HOST_MASTER_DIR}/namenode/start" /start-namenode
-RUN sed -i 's/\r$//g' /start-namenode
-RUN chmod +x /start-namenode
+# journalnode
+# COPY "${HOST_MASTER_DIR}/journalnode/start" /start-jn
+# RUN sed -i 's/\r$//g' /start-jn
+# RUN chmod +x /start-jn
 
-COPY "${HOST_MASTER_DIR}/resource-manager/start" /start-rm
-RUN sed -i 's/\r$//g' /start-rm
-RUN chmod +x /start-rm
+# resource-manager
+# COPY "${HOST_MASTER_DIR}/resource-manager/start" /start-rm
+# RUN sed -i 's/\r$//g' /start-rm
+# RUN chmod +x /start-rm
 
-COPY "${HOST_MASTER_DIR}/spark-master/start" /start-spark-master
-RUN sed -i 's/\r$//g' /start-spark-master
-RUN chmod +x /start-spark-master
+# yarn-history
+# COPY "${HOST_MASTER_DIR}/yarn-history/start" /start-yh
+# RUN sed -i 's/\r$//g' /start-yh
+# RUN chmod +x /start-yh
 
-COPY "${HOST_MASTER_DIR}/hive-start.sh" /start-hive
-RUN sed -i 's/\r$//g' /start-flower
-RUN chmod +x /start-flower
+# hive-metastore
+# COPY "${HOST_MASTER_DIR}/hive-metastore/start" /start-hm
+# RUN sed -i 's/\r$//g' /start-hm
+# RUN chmod +x /start-hm
 
-COPY run.sh /usr/local/sbin/run.sh
-RUN sudo chmod a+x /usr/local/sbin/run.sh
+# # spark-history
+# COPY "${HOST_MASTER_DIR}/spark-history/start" /start-sh
+# RUN sed -i 's/\r$//g' /start-sh
+# RUN chmod +x /start-sh
 
+# RUN "zkServer.sh start zoo.cfg"
+# COPY run.sh /usr/local/sbin/run.sh
+# RUN sudo chmod a+x /usr/local/sbin/run.sh
 
+COPY ./docker/master-server/entrypoint /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint
+RUN chmod +x /entrypoint
+
+ENTRYPOINT [ "/entrypoint" ]

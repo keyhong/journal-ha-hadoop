@@ -4,6 +4,5 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# datanode process start
-echo "Starting Hadoop datanode..."
+echo "Starting Hadoop datanode process..."
 hdfs --daemon start datanode

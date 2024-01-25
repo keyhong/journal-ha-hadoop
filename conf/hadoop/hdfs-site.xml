@@ -16,40 +16,127 @@
 
 <!-- Put site-specific property overrides in this file. -->
 
-<!-- https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml -->
+<!-- https://hadoop.apache.org/docs/r3.3.6/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml -->
 <configuration>
+    <!-- 네임노드, 데이터노드 데이터 저장 경로 -->
     <property>
         <name>dfs.namenode.name.dir</name>
-        <value>file:///data/dfs/name</value>
+        <value>file:///data/hadoop/dfs/name</value>
         <description>
             Determines where on the local filesystem the DFS name node should store the name table(fsimage).
+            If this is a comma-delimited list of directories then the name table is replicated in all of the directories, for redundancy.
         </description>
     </property>
     <property>
         <name>dfs.datanode.data.dir</name>
-        <value>file:///data/dfs/data</value>
+        <value>file:///data/hadoop/dfs/data</value>
         <description>
             Determines where on the local filesystem an DFS data node should store its blocks.
+            If this is a comma-delimited list of directories, then data will be stored in all named directories, typically on different devices.
+            The directories should be tagged with corresponding storage types ([SSD]/[DISK]/[ARCHIVE]/[RAM_DISK]) for HDFS storage policies.
+            The default storage type will be DISK if the directory does not have a storage type tagged explicitly.
+            Directories that do not exist will be created if local filesystem permission allows.
         </description>
-    </property>
-    <property>
-        <name>dfs.namenode.checkpoint.dir</name>
-        <value>file:///data/dfs/namesecondary</value>
-        <description>
-            Determines where on the local filesystem the DFS secondary name node should store the temporary images to merge.
-        </description>
-    </property>
-    <property>
-        <name>dfs.journalnode.edits.dir</name>
-        <value>/tmp/hadoop/dfs/journalnode/</value>
-        <description>The directory where the journal edit files are stored.</description>
     </property>
 
+    <!-- namenode HA -->
+    <property>
+        <name>dfs.nameservices</name>
+        <value>cluster-01</value>
+        <description>Comma-separated list of nameservices.</description>
+    </property>
+    <property>
+        <name>dfs.ha.namenodes.cluster-01</name>
+        <value>namenode1,namenode2</value>
+        <description>
+            The prefix for a given nameservice, contains a comma-separated list of namenodes for a given nameservice (eg EXAMPLENAMESERVICE).
+            Unique identifiers for each NameNode in the nameservice, delimited by commas.
+            This will be used by DataNodes to determine all the NameNodes in the cluster.
+            For example, if you used “mycluster” as the nameservice ID previously, and you wanted to use “nn1” and “nn2” as the individual IDs of the NameNodes,
+            you would configure a property dfs.ha.namenodes.mycluster, and its value "nn1,nn2".
+        </description>     
+    </property>    
+    <property>
+        <name>dfs.namenode.rpc-address.cluster-01.namenode1</name>
+        <value>master-server:8020</value>
+        <description>
+            RPC address that handles all clients requests.
+            In the case of HA/Federation where multiple namenodes exist, the name service id is added to the name e.g. dfs.namenode.rpc-address.ns1 dfs.namenode.rpc-address.
+            EXAMPLENAMESERVICE The value of this property will take the form of nn-host1:rpc-port. The NameNode's default RPC port is 8020.
+        </description>
+    </property>
+    <property>
+        <name>dfs.namenode.rpc-address.cluster-01.namenode2</name>
+        <value>slave-server-1:8020</value>
+    </property>
+    <!-- journalnode HA -->
+    <property>
+        <name>dfs.journalnode.edits.dir</name>
+        <value>/data/hadoop/dfs/journal</value>
+        <description>The directory where the journal edit files are stored.</description>        
+    </property>
+    <!-- <property>
+        <name>dfs.journalnode.rpc-address</name>
+        <value>master-server:8485;slave-server-1:8485</value>
+        <description>The JournalNode RPC server address and port.</description>
+    </property> -->
+    <property>
+        <name>dfs.namenode.shared.edits.dir</name>
+        <value>qjournal://master-server:8485;slave-server-1:8485/cluster-01</value>
+        <description>
+            A directory on shared storage between the multiple namenodes in an HA cluster.
+            This directory will be written by the active and read by the standby in order to keep the namespaces synchronized.
+            This directory does not need to be listed in dfs.namenode.edits.dir above. It should be left empty in a non-HA cluster.
+        </description>
+    </property>
 
     <!-- Replication factor. Files you store on HDFS will be stored on this many machines -->
     <property>
         <name>dfs.replication</name>
         <value>2</value>
-        <description>Default block replication.</description>
+        <description>
+            Default block replication. The actual number of replications can be specified when the file is created.
+            The default is used if replication is not specified in create time.
+        </description>
     </property>
+    <property>
+        <name>dfs.blocksize</name>
+        <value>134217728</value>
+    <description>The default block size for new files, in bytes. 134,217,728 bytes is equivalent to approximately 128 MiB. </description>
+    </property>
+
+    <property>
+        <name>dfs.client.failover.proxy.provider.cluster-01</name>
+        <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+        <description>
+            The prefix (plus a required nameservice ID) for the class name of the configured Failover proxy provider for the host.
+            For normal HA mode, please consult the "Configuration Details" section of the HDFS High Availability documentation.
+            For observer reading mode, please choose a custom class--ObserverReadProxyProvider.
+        </description>
+    </property>
+    <property>
+        <name>dfs.ha.fencing.methods</name>
+        <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+        <description>
+            A list of scripts or Java classes which will be used to fence the Active NameNode during a failover.
+            See the HDFS High Availability documentation for details on automatic HA configuration.
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.ha.fencing.methods</name>
+        <value>shell(/bin/true)</value>
+        <description>
+            A list of scripts or Java classes which will be used to fence the Active NameNode during a failover.
+            See the HDFS High Availability documentation for details on automatic HA configuration.
+        </description>
+    </property>
+    <property>
+        <name>dfs.ha.automatic-failover.enabled</name>
+        <value>true</value>
+        <description>Whether automatic failover is enabled. See the HDFS High Availability documentation for details on automatic HA configuration.</description>
+    </property>
+
+
+
 </configuration>

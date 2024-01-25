@@ -8,18 +8,6 @@ PYSPARK_PYTHON=python3
 # Hostname your Spark program will advertise to other machines.
 # SPARK_PUBLIC_DNS=localhost
 
-
-
-
-
-
-
-
-
-
-
-
-
 # Start the master on a different port (default: 7077).
 # SPARK_MASTER_PORT=7177
 

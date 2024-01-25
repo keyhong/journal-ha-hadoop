@@ -17,8 +17,8 @@ down-v-rmi:
 # show-logs:
 # 	docker compose -f docker-compose.yml logs
 
-# show-logs-api:
-# 	docker compose -f docker-compose.yml logs api
+show-logs-master:
+	docker compose -f docker-compose.yml logs master-server
 
 # makemigrations:
 # 	docker compose -f docker-compose.yml run --rm api python manage.py makemigrations

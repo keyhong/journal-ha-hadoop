@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+mkdir -p "${JOURNALNODE_DATA_DIR}"
+
+# 저널노드 start
+echo "Starting Hadoop journalnode process..."
+hdfs --daemon start journalnode

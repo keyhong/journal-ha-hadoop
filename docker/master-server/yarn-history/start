@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Starting Hadoop history server..."
+yarn --daemon start historyserver

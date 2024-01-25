@@ -1,14 +1,22 @@
-FROM keyhong/base-hadoop
+FROM keyhong/base-hadoop:1.0
 
-# Copy Hadoop Config Files to Container 
-ARG HOST_HADOOP_CONF_DIR=./conf/hadoop
+RUN sed -i "s|\$(hostname)|0.0.0.0|g" "${ZOOKEEPER_CONF_DIR}/zoo.cfg"
 
-ENV DATADIR=/opt/hadoop/dfs/data
-RUN mkdir -p /opt/hadoop/dfs/data
+ENV DATANODE_DATA_DIR=/data/hadoop/dfs/data
 
-ENV SPARK_MASTER_ADDRESS=spark://master-server:7077
+RUN mkdir -p ${DATANODE_DATA_DIR}
 
-COPY run.sh /usr/local/sbin/run.sh
-RUN sudo chmod a+x /usr/local/sbin/run.sh
+RUN echo "3" > "/opt/zookeeper/data/myid"
 
+# COPY run.sh /usr/local/sbin/run.sh
+# RUN sudo chmod a+x /usr/local/sbin/run.sh
 
+# COPY "${HOST_SLAVE_2_DIR}/hive-server2/start.sh" /start-hs
+# RUN sed -i 's/\r$//g' /start-hs
+# RUN chmod +x /start-hs
+
+COPY ./docker/master-server/entrypoint /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint
+RUN chmod +x /entrypoint
+
+ENTRYPOINT [ "/entrypoint" ]

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -o errexit
+
+set -o pipefail
+
+set -o nounset
+
+sed -i "s|$(hostname)|0.0.0.0|g" "${ZOOKEEPER_CONF_DIR}/zoo.cfg"
+
+# exec zkServer.sh start zoo.cfg
+
+sleep 6000

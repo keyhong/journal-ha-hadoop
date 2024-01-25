@@ -32,10 +32,14 @@ ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 FROM linux-build-stage as hadoop-build-stage
 
 # CDN 미러 사이트를 이용해서 Hadoop 다운로드 (KAIST)
-ARG HADOOP_VERSION=3.3.6
+ARG HADOOP_VERSION=3.3.6 
 ARG HADOOP_URL=http://apache.mirror.cdnetworks.com/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
 
 ENV HADOOP_HOME=/opt/hadoop
+
+ENV HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop \
+    PATH=${PATH}:${HADOOP_HOME}/sbin:${HADOOP_HOME}/bin \
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HADOOP_HOME}/lib/native
 
 RUN set -x \
     && curl -fL ${HADOOP_URL} -o /tmp/hadoop.tar.gz \
@@ -54,20 +58,18 @@ RUN set -x \
 # -i[SUFFIX], --in-place[=SUFFIX] : 파일이 내부에서 편집되도록 지정합니다.
 # -e script, --expression=script : 입력을 처리하는 동안 실행할 명령 집합에 스크립트 의 명령을 추가합니다.
 
-ENV HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
-ENV PATH=${PATH}:${HADOOP_HOME}/sbin:${HADOOP_HOME}/bin
-ENV LD_LIBRARY_PATH=${HADOOP_HOME}/lib/native:${LD_LIBRARY_PATH}
 
-# Copy Hadoop Config Files to Container 
-ARG HOST_HADOOP_CONF_DIR=./conf/hadoop
-
-COPY "${HOST_HADOOP_CONF_DIR}"/* "${HADOOP_CONF_DIR}"
 
 # === Stage 3: Hive Build ===
 FROM hadoop-build-stage as hive-build-stage
+
 ARG HIVE_VERSION=3.1.3
 ARG HIVE_URL=http://apache.mirror.cdnetworks.com/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz
+
 ENV HIVE_HOME=/opt/hive
+
+ENV HIVE_CONF_DIR=${HIVE_HOME}/conf \
+    PATH=${PATH}:${HIVE_HOME}/sbin:${HIVE_HOME}/bin
 
 RUN set -x \
     && curl -fL ${HIVE_URL} -o /tmp/hive.tar.gz \
@@ -79,15 +81,8 @@ RUN set -x \
     rm ${HIVE_HOME}/lib/guava-*.jar \
     && cp ${HADOOP_HOME}/share/hadoop/hdfs/lib/guava-*.jar ${HIVE_HOME}/lib/
 
-ENV HIVE_CONF_DIR=${HIVE_HOME}/conf
-ENV PATH=${PATH}:${HIVE_HOME}/sbin:${HIVE_HOME}/bin
-
-# Hive Config Files to Container
-ARG HOST_HIVE_CONF_DIR=./conf/hive
-COPY "${HOST_HIVE_CONF_DIR}/hive-site.xml" "${HIVE_CONF_DIR}"
-
 # Copy local mysql.jar file to container
-COPY "${HOST_HIVE_CONF_DIR}/mysql-connector-j-8.3.0.jar" "/opt/hive/lib/"
+COPY "./conf/hive/mysql-connector-j-8.3.0.jar" "/opt/hive/lib/"
 
 # === Stage 4: Zookeeper Build ===
 FROM hive-build-stage as zookeeper-build-stage
@@ -97,18 +92,14 @@ ARG ZOOKEEPER_URL=http://apache.mirror.cdnetworks.com/zookeeper/zookeeper-${ZOOK
 
 ENV ZOOKEEPER_HOME=/opt/zookeeper
 
+ENV PATH=${PATH}:${ZOOKEEPER_HOME}/bin \
+    ZOOKEEPER_CONF_DIR=${ZOOKEEPER_HOME}/conf
+
 RUN set -x \
     && curl -fL "${ZOOKEEPER_URL}" -o "/tmp/zookeeper.tar.gz" \
-    && mkdir -p "${ZOOKEEPER_HOME}" \
+    && mkdir -p "${ZOOKEEPER_HOME}/data" \
     && tar -zxf "/tmp/zookeeper.tar.gz" -C "${ZOOKEEPER_HOME}" --strip-components 1 \
     && rm /tmp/zookeeper*
-
-ENV PATH="${ZOOKEEPER_HOME}":"${PATH}"
-ENV ZOOKEEPER_CONF_DIR=${ZOOKEEPER_HOME}/conf
-
-# Zookeeper Config Files to Container
-ARG HOST_ZOOKEEPER_CONF_DIR=./conf/zookeeper
-COPY "${HOST_ZOOKEEPER_CONF_DIR}/zoo.cfg" "${ZOOKEEPER_CONF_DIR}"
 
 
 # === Stage 5: Spark Build ===
@@ -116,53 +107,29 @@ FROM zookeeper-build-stage as spark-build-stage
 
 ARG SPARK_VERSION=3.4.2
 ARG SPARK_URL=http://apache.mirror.cdnetworks.com/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz
+
 ENV SPARK_HOME=/opt/spark
 
-# TODO: 수정 필요
-# ARG POSTGERSQL_JDBC_VERSION=42.7.1
+ENV SPARK_CONF_DIR=${SPARK_HOME}/conf \
+    PATH=${SPARK_HOME}/sbin:${SPARK_HOME}/bin:${PATH} \
+    PYTHONHASHSEED=1
 
 RUN set -x \
     && curl -fL ${SPARK_URL} -o /tmp/spark.tgz \
     && mkdir -p ${SPARK_HOME} \
     && tar -zxf /tmp/spark.tgz -C ${SPARK_HOME} --strip-components 1 \
     && rm /tmp/spark*
-    # TODO: 수정 필요
-    # && curl -fsSL https://jdbc.postgresql.org/download/postgresql-${POSTGERSQL_JDBC_VERSION}.jar -o ${SPARK_HOME}/jars/postgresql-${POSTGERSQL_JDBC_VERSION}.jar
-
-ENV PYTHONHASHSEED=1
-
-ENV SPARK_CONF_DIR=${SPARK_HOME}/conf
-ENV PATH=${SPARK_HOME}/sbin:${SPARK_HOME}/bin:${PATH}
-
-# Spark Config Files to Container 
-ARG HOST_SPARK_CONF_DIR=./conf/spark
-
-COPY [ \
-    "${HOST_SPARK_CONF_DIR}/spark-defaults.conf", \
-    "${HOST_SPARK_CONF_DIR}/log4j.properties", \
-    "${SPARK_CONF_DIR}" \
-]
 
 RUN cp "/opt/hive/lib/mysql-connector-j-8.3.0.jar" "${SPARK_HOME}/jars/"
 
-# Hadoop worker & Spark worker Sync (Hard link)
-RUN ln "${HADOOP_CONF_DIR}/workers" "${SPARK_CONF_DIR}/" \
-    && ln "${HIVE_CONF_DIR}/hive-site.xml" "${SPARK_CONF_DIR}/"
-
-# Entry point
-# COPY entrypoint.sh /usr/local/sbin/entrypoint.sh
-# RUN sudo chmod a+x /usr/local/sbin/entrypoint.sh
-# ENTRYPOINT ["entrypoint.sh"]
-
 
 # === Stage 6: Airflow Build ===
-FROM zookeeper-build-stage as airflw-build-stage
+FROM spark-build-stage as airflw-build-stage
 
 ENV AIRFLOW_HOME=/opt/airflow
 
 ARG AIRFLOW_VERSION=2.8.1
-
-ARG PYTHON_VERSION=3.10
+# PYTHON_VERSION=3.10
 
 RUN set -x \
     && pip install virtualenv \
@@ -173,5 +140,28 @@ RUN set -x \
     && pip install "apache-airflow[celery]==${AIRFLOW_VERSION}" \
         --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
     # && pip install mysqlclient
-    
-COPY ./conf/airflow/airflow.cfg /opt/airflow
+
+# === Stage 7: Copy Config Files ===
+FROM spark-build-stage as config-copy-stage
+
+# Copy Hadoop Config Files to Container 
+COPY "./conf/hadoop/*" "${HADOOP_CONF_DIR}"
+
+# Zookeeper Config Files to Container
+COPY "./conf/zookeeper/zoo.cfg" "${ZOOKEEPER_CONF_DIR}/zoo.cfg"
+
+# Hive Config Files to Container
+COPY "./conf/hive/hive-site.xml" "${HIVE_CONF_DIR}"
+
+# Spark Config Files to Container 
+COPY "./conf/spark/*" "${SPARK_CONF_DIR}"
+
+# Copy hive-site.xml (Hard link)
+RUN ln "${HIVE_CONF_DIR}/hive-site.xml" "${SPARK_CONF_DIR}/"
+
+COPY "./conf/airflow/airflow.cfg" "/opt/airflow"
+
+# Entry point
+# COPY entrypoint.sh /usr/local/sbin/entrypoint.sh
+# RUN sudo chmod a+x /usr/local/sbin/entrypoint.sh
+# ENTRYPOINT ["entrypoint.sh"]

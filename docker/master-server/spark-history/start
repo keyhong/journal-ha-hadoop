@@ -6,7 +6,6 @@ set -o nounset
 
 SPARK_JARS_HDFS_PATH=/spark/jars
 SPARK_LOGS_HDFS_PATH=/var/log/spark
-SPARK_MASTER_HOST=172.28.1.2
 
 # spark log 저장 경로 설정
 if ! hdfs dfs -test -d "${SPARK_LOGS_HDFS_PATH}"
@@ -22,6 +21,3 @@ then
   hdfs dfs -mkdir -p  "${SPARK_JARS_HDFS_PATH}"
   hdfs dfs -put "${SPARK_HOME}"/jars/* "${SPARK_JARS_HDFS_PATH}"/
 fi
-
-echo "Starting Spark master node..."
-spark-class org.apache.spark.deploy.master.Master --ip "${SPARK_MASTER_HOST}"
