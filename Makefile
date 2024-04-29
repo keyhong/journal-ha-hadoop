@@ -1,36 +1,35 @@
 build:
-	docker compose -f docker-compose.yml up --build -d --remove-orphans
+	docker compose up --build -d --remove-orphans
 
 up:
-	docker compose -f docker-compose.yml up -d
+	docker compose up -d
 
 down:
-	docker compose -f docker-compose.yml down
+	docker compose down
 
 down-v:
-	docker compose -f docker-compose.yml down -v 
+	docker compose down -v 
 
 down-v-rmi:
-	docker compose -f docker-compose.yml down -v --rmi all
+	docker compose down -v --rmi all
 
-
-# show-logs:
-# 	docker compose -f docker-compose.yml logs
+show-logs:
+	docker compose logs
 
 show-logs-master:
-	docker compose -f docker-compose.yml logs master-server
+	docker compose logs master-server
 
 # makemigrations:
-# 	docker compose -f docker-compose.yml run --rm api python manage.py makemigrations
+# 	docker compose run --rm api python manage.py makemigrations
 
 # migrate:
-# 	docker compose -f docker-compose.yml run --rm api python manage.py migrate
+# 	docker compose run --rm api python manage.py migrate
 
 # collectstatic:
-# 	docker compose -f docker-compose.yml run --rm api python manage.py collectstatic --no-input --clear
+# 	docker compose run --rm api python manage.py collectstatic --no-input --clear
 
 # superuser:
-# 	docker compose -f docker-compose.yml run --rm api python manage.py createsuperuser
+# 	docker compose run --rm api python manage.py createsuperuser
 
 
 
@@ -38,27 +37,27 @@ show-logs-master:
 # 	docker volume inspect src_local_postgres_data
 
 # authors-db:
-# 	docker compose -f docker-compose.yml exec postgres psql --username=alphaogilo --dbname=authors-live
+# 	docker compose exec postgres psql --username=alphaogilo --dbname=authors-live
 
 # flake8:
-# 	docker compose -f docker-compose.yml exec api flake8 .
+# 	docker compose exec api flake8 .
 
 # black-check:
-# 	docker compose -f docker-compose.yml exec api black --check --exclude=migrations .
+# 	docker compose exec api black --check --exclude=migrations .
 
 # black-diff:
-# 	docker compose -f docker-compose.yml exec api black --diff --exclude=migrations .
+# 	docker compose exec api black --diff --exclude=migrations .
 
 # black:
-# 	docker compose -f docker-compose.yml exec api black --exclude=migrations .
+# 	docker compose exec api black --exclude=migrations .
 
 # isort-check:
-# 	docker compose -f docker-compose.yml exec api isort . --check-only --skip venv --skip migrations
+# 	docker compose exec api isort . --check-only --skip venv --skip migrations
 
 # isort-diff:
-# 	docker compose -f docker-compose.yml exec api isort . --diff --skip venv --skip migrations
+# 	docker compose exec api isort . --diff --skip venv --skip migrations
 
 # isort:
-# 	docker compose -f docker-compose.yml exec api isort . --skip venv --skip migrations
+# 	docker compose exec api isort . --skip venv --skip migrations
 
 

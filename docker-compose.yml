@@ -1,8 +1,11 @@
 ---
-
+version: "3.9"
 
 services:
 
+  ####################################################################################################
+  # MySQL : Hadoop Metastore, Airflow Metastore
+  ####################################################################################################
   mysql-server:
     image: mysql:8.0.36-bullseye
     container_name: mysql-server
@@ -37,6 +40,9 @@ services:
       - "slave-server-1:172.28.1.102"
       - "slave-server-2:172.28.1.103"
 
+  ####################################################################################################
+  # Airflow
+  ####################################################################################################
   # redis:
   #     image: redis:5.0.5
   #     command: redis-server --requirepass redispass
@@ -162,7 +168,7 @@ services:
         ipv4_address: 172.28.1.103
 
 
-  # redis:
+  # spark:
   #   image: hadoop-hive-spark-dev
   #   hostname: dev
   #   environment:
