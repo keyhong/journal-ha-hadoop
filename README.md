@@ -3,7 +3,7 @@
 | Component                              | Version | Description              |
 |----------------------------------------|---------|--------------------------|
 | [Ubuntu](https://ubuntu.com/)          | 22.04   | Operating System         |
-| [Hadoop](https://hadoop.apache.org/)   | 1.5+    | Distributed File System  |
+| [Hadoop](https://hadoop.apache.org/)   | 3.3.6   | Distributed File System  |
 
 
 ## Getting Started
