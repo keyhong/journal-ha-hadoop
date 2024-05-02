@@ -1,5 +1,7 @@
 # Journal HA Hadoop Cluster
 
+description: https://keyhong.github.io/2024/02/07/Hadoop/hadoop3-docker-installation/
+
 | Component                              | Version | Description              |
 |----------------------------------------|---------|--------------------------|
 | [Ubuntu](https://ubuntu.com/)          | 22.04   | Operating System         |
