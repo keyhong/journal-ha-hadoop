@@ -2,10 +2,14 @@
 
 description: https://keyhong.github.io/2024/02/07/Hadoop/hadoop3-docker-installation/
 
-| Component                              | Version | Description              |
-|----------------------------------------|---------|--------------------------|
-| [Ubuntu](https://ubuntu.com/)          | 22.04   | Operating System         |
-| [Hadoop](https://hadoop.apache.org/)   | 3.3.6   | Distributed File System  |
+| Component                                  | Version | Description              |
+|--------------------------------------------|---------|--------------------------|
+| [Ubuntu](https://ubuntu.com/)              | 22.04   | The modern, open source operating system on Linux |
+| [Python](https://www.python.org/)          | 3.10    | An interpreted, object-oriented, high-level programming language with dynamic semantics |
+| [Hadoop](https://hadoop.apache.org/)       | 3.3.6   | A framework that allows for the distributed processing of large data sets across clusters of computers using simple programming models |
+| [zookeeper](https://zookeeper.apache.org/) | 3.9.1   | A centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services | 
+| [Hive](https://hive.apache.org/)           | 3.1.3   | A distributed, fault-tolerant data warehouse system | 
+| [spark](https://spark.apache.org/)         | 3.4.2   | A multi-language engine for executing data engineering, data science, and machine learningng |
 
 
 ## Getting Started
